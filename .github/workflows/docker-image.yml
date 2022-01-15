@@ -1,0 +1,18 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the rest_api_flint.example Docker image
+        run: docker build . --file local/rest_api_flint.example/Dockerfile --tag my-image-name:$(date +%s)
+      - name: Build the rest_api_gcbm Docker image
+        run: docker build . --file local/rest_api_gcbm/Dockerfile --tag my-image-name:$(date +%s)
