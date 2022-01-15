@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [master]
+
+jobs:
+  # Build the Flask-GCBM REST API Setup
+
+  build-gcbm-api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./local/rest_api_gcbm
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build FLINT Cloud container
+        run: docker build -t gcbm-api .
+
+  linting-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+      - name: Upgrade pip version
+        run: |
+          python3 -m pip install --upgrade pip
+      - name: Lint source with Flake8
+        run: |
+          pip3 install flake8
+          flake8 .
+      - name: Checks the Documentation Build
+        uses: ammaraskar/sphinx-action@master
+        with:
+          docs-folder: "docs/"
+
+  linting-docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: "Lint Dockerfile"
+        uses: jbergstroem/hadolint-gh-action@v1
+        with:
+          dockerfile: "./local/rest_api_flint.example/Dockerfile
+            ./local/rest_api_gcbm/Dockerfile
+            ./layered/cloud-run/Dockerfile
+            ./layered/compute-engine/Dockerfile
+            ./layered/ingress/Dockerfile"
+          error_level: 0
+          output_format: tty
