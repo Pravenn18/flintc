@@ -7,12 +7,22 @@ on:
     branches: [master]
 
 jobs:
-  build:
+  build-rest-api-flint-example:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./local/rest_api_flint.example
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build the rest_api_gcbm Docker image
+        run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
 
+  build-rest-api-gcbm:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./local/rest_api_gcbm
     steps:
       - uses: actions/checkout@v2
       - name: Build the rest_api_flint.example Docker image
-        run: docker build . --file local/rest_api_flint.example/** --tag my-image-name:$(date +%s)
-      - name: Build the rest_api_gcbm Docker image
-        run: docker build . --file local/rest_api_gcbm/** --tag my-image-name:$(date +%s)
+        run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
